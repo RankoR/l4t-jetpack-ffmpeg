@@ -56,12 +56,17 @@ FROM build-nvmpi AS main
 
 ARG FFMPEG_VERSION=8.0
 
+# Set PKG_CONFIG_PATH to include nvmpi installation location
+ENV PKG_CONFIG_PATH=/usr/local/lib/pkgconfig:${PKG_CONFIG_PATH}
+
 RUN wget https://ffmpeg.org/releases/ffmpeg-${FFMPEG_VERSION}.tar.bz2 \
     && tar xvf ffmpeg-${FFMPEG_VERSION}.tar.bz2 \
     && rm ffmpeg-${FFMPEG_VERSION}.tar.bz2 \
     && cd jetson-ffmpeg \
     && ./ffpatch.sh ../ffmpeg-${FFMPEG_VERSION} \
     && cd ../ffmpeg-${FFMPEG_VERSION} \
+    && ldconfig \
+    && pkg-config --exists nvmpi && echo "nvmpi found!" || echo "nvmpi NOT found" \
     && ./configure \
         --enable-gpl \
         --enable-nonfree \
