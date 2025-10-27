@@ -56,8 +56,7 @@ FROM build-nvmpi AS main
 
 ARG FFMPEG_VERSION=8.0
 
-# Set PKG_CONFIG_PATH to include nvmpi installation location
-ENV PKG_CONFIG_PATH=/usr/local/lib/pkgconfig:${PKG_CONFIG_PATH}
+ENV PKG_CONFIG_PATH=/usr/local/lib/pkgconfig:/usr/lib/pkgconfig:/usr/lib/aarch64-linux-gnu/pkgconfig
 
 RUN wget https://ffmpeg.org/releases/ffmpeg-${FFMPEG_VERSION}.tar.bz2 \
     && tar xvf ffmpeg-${FFMPEG_VERSION}.tar.bz2 \
@@ -66,7 +65,16 @@ RUN wget https://ffmpeg.org/releases/ffmpeg-${FFMPEG_VERSION}.tar.bz2 \
     && ./ffpatch.sh ../ffmpeg-${FFMPEG_VERSION} \
     && cd ../ffmpeg-${FFMPEG_VERSION} \
     && ldconfig \
-    && pkg-config --exists nvmpi && echo "nvmpi found!" || echo "nvmpi NOT found" \
+    && echo "=== Searching for nvmpi.pc ===" \
+    && find / -name "nvmpi.pc" 2>/dev/null \
+    && echo "=== Content of nvmpi.pc ===" \
+    && cat $(find / -name "nvmpi.pc" 2>/dev/null | head -1) \
+    && echo "=== Testing pkg-config commands ===" \
+    && pkg-config --exists nvmpi && echo "EXISTS: OK" || echo "EXISTS: FAIL" \
+    && pkg-config --cflags nvmpi && echo "CFLAGS: OK" || echo "CFLAGS: FAIL" \
+    && pkg-config --libs nvmpi && echo "LIBS: OK" || echo "LIBS: FAIL" \
+    && pkg-config --modversion nvmpi && echo "VERSION: OK" || echo "VERSION: FAIL" \
+    && echo "=== Starting configure ===" \
     && ./configure \
         --enable-gpl \
         --enable-nonfree \
