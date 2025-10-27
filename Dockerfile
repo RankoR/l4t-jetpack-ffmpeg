@@ -38,6 +38,15 @@ RUN apt-get update && \
 #
 FROM build-dependencies AS build-nvmpi
 
+RUN cd /usr/lib/aarch64-linux-gnu/nvidia && \
+    for lib in libnvbufsurface libnvbufsurftransform libnvjpeg; do \
+        if [ -f ${lib}.so.* ] && [ ! -f ${lib}.so ]; then \
+            ln -s $(ls ${lib}.so.* | head -1) ${lib}.so; \
+            echo "Created symlink: ${lib}.so -> $(ls ${lib}.so.* | head -1)"; \
+        fi; \
+    done && \
+    ldconfig
+
 RUN git clone https://github.com/Keylost/jetson-ffmpeg.git \
     && cd jetson-ffmpeg \
     && mkdir build \
