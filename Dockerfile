@@ -54,7 +54,7 @@ RUN git clone https://github.com/Keylost/jetson-ffmpeg.git \
 #
 FROM build-nvmpi AS main
 
-ARG FFMPEG_VERISON=8.0
+ARG FFMPEG_VERSION=8.0
 
 RUN wget https://ffmpeg.org/releases/ffmpeg-${FFMPEG_VERSION}.tar.bz2 \
     && tar xvf ffmpeg-${FFMPEG_VERSION}.tar.bz2 \
