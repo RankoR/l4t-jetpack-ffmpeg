@@ -56,7 +56,7 @@ FROM build-nvmpi AS main
 
 ARG FFMPEG_VERSION=8.0
 
-ENV PKG_CONFIG_PATH=/usr/local/lib/pkgconfig:/usr/lib/pkgconfig:/usr/lib/aarch64-linux-gnu/pkgconfig
+ENV PKG_CONFIG_PATH=/usr/local/lib/pkgconfig:/usr/lib/pkgconfig
 
 RUN wget https://ffmpeg.org/releases/ffmpeg-${FFMPEG_VERSION}.tar.bz2 \
     && tar xvf ffmpeg-${FFMPEG_VERSION}.tar.bz2 \
@@ -65,15 +65,21 @@ RUN wget https://ffmpeg.org/releases/ffmpeg-${FFMPEG_VERSION}.tar.bz2 \
     && ./ffpatch.sh ../ffmpeg-${FFMPEG_VERSION} \
     && cd ../ffmpeg-${FFMPEG_VERSION} \
     && ldconfig \
-    && echo "=== Searching for nvmpi.pc ===" \
-    && find / -name "nvmpi.pc" 2>/dev/null \
-    && echo "=== Content of nvmpi.pc ===" \
-    && cat $(find / -name "nvmpi.pc" 2>/dev/null | head -1) \
+    && echo "=== Checking for nvmpi library files ===" \
+    && ls -la /usr/local/lib/libnvmpi* || echo "NO libnvmpi.so in /usr/local/lib" \
+    && ls -la /usr/local/include/nvmpi* || echo "NO nvmpi headers in /usr/local/include" \
+    && echo "=== Searching entire system for nvmpi libraries ===" \
+    && find / -name "libnvmpi*" 2>/dev/null || echo "No libnvmpi found anywhere" \
+    && echo "=== Checking library dependencies ===" \
+    && ldd /usr/local/lib/libnvmpi.so 2>/dev/null || echo "Cannot check ldd - file may not exist" \
     && echo "=== Testing pkg-config commands ===" \
     && pkg-config --exists nvmpi && echo "EXISTS: OK" || echo "EXISTS: FAIL" \
     && pkg-config --cflags nvmpi && echo "CFLAGS: OK" || echo "CFLAGS: FAIL" \
     && pkg-config --libs nvmpi && echo "LIBS: OK" || echo "LIBS: FAIL" \
-    && pkg-config --modversion nvmpi && echo "VERSION: OK" || echo "VERSION: FAIL" \
+    && echo "=== Manual compile test ===" \
+    && echo '#include <stdio.h>' > /tmp/test.c \
+    && echo 'int main() { printf("basic test"); return 0; }' >> /tmp/test.c \
+    && gcc /tmp/test.c -o /tmp/test $(pkg-config --cflags --libs nvmpi) && echo "MANUAL LINK: OK" || echo "MANUAL LINK: FAIL" \
     && echo "=== Starting configure ===" \
     && ./configure \
         --enable-gpl \
@@ -85,10 +91,10 @@ RUN wget https://ffmpeg.org/releases/ffmpeg-${FFMPEG_VERSION}.tar.bz2 \
         --disable-doc \
         --disable-ffplay \
         --disable-alsa \
-        --extra-libs="-ldl" \
+        --extra-libs="-ldl -lpthread -lm" \
         --enable-shared \
         --enable-pic \
-        --extra-libs="-lpthread -lm" \
+    || (echo "=== CONFIGURE FAILED - Showing config.log tail ===" && tail -100 ffbuild/config.log && exit 1) \
     && make -j$(nproc) \
     && make install \
     && ldconfig \
