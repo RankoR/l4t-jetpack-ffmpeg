@@ -38,27 +38,7 @@ RUN apt-get update && \
 #
 FROM build-dependencies AS build-nvmpi
 
-RUN echo "=== Checking NVIDIA library existence during BUILD ===" \
-    && ls -la /usr/lib/aarch64-linux-gnu/nvidia/ || echo "Directory doesn't exist" \
-    && ls -la /usr/lib/aarch64-linux-gnu/nvidia/libnvjpeg* || echo "libnvjpeg not found" \
-    && ls -la /usr/lib/aarch64-linux-gnu/nvidia/libnvbufsurface* || echo "libnvbufsurface not found" \
-    && ls -la /usr/lib/aarch64-linux-gnu/nvidia/libnvbufsurftransform* || echo "libnvbufsurftransform not found" \
-    && ls -la /usr/lib/aarch64-linux-gnu/libv4l2* || echo "libv4l2 not found" \
-    && file /usr/lib/aarch64-linux-gnu/nvidia/libnvjpeg.so 2>/dev/null || echo "Cannot stat libnvjpeg.so" \
-    && echo "=== End diagnostic ==="
-
-RUN cd /usr/lib/aarch64-linux-gnu/nvidia && \
-    for lib in libnvbufsurface libnvbufsurftransform libnvjpeg; do \
-        if [ -f ${lib}.so.* ] && [ ! -f ${lib}.so ]; then \
-            ln -s $(ls ${lib}.so.* | head -1) ${lib}.so; \
-            echo "Created symlink: ${lib}.so -> $(ls ${lib}.so.* | head -1)"; \
-        fi; \
-    done && \
-    ldconfig
-
-RUN mkdir -p /usr/lib/aarch64-linux-gnu/nvidia && \
-    cp -a /usr/lib/aarch64-linux-gnu/nvidia/* /usr/lib/aarch64-linux-gnu/nvidia/ 2>/dev/null || true \
-    && ls -la /usr/lib/aarch64-linux-gnu/nvidia/libnvjpeg.so
+RUN ls -la /usr/lib/aarch64-linux-gnu/nvidia/libnvjpeg.so
 
 RUN git clone https://github.com/Keylost/jetson-ffmpeg.git \
     && cd jetson-ffmpeg \
