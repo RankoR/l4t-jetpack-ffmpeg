@@ -43,16 +43,15 @@ RUN git clone https://github.com/Keylost/jetson-ffmpeg.git \
     && mkdir build \
     && cd build \
     && cmake -DCMAKE_INSTALL_PREFIX=/usr/local \
+             -DCMAKE_BUILD_TYPE=Release \
              -DLIB_NVBUFSURFACE=/usr/lib/aarch64-linux-gnu/nvidia/libnvbufsurface.so \
              -DLIB_NVBUFSURFTRANSFORM=/usr/lib/aarch64-linux-gnu/nvidia/libnvbufsurftransform.so \
              -DLIB_NVJPEG=/usr/lib/aarch64-linux-gnu/nvidia/libnvjpeg.so \
              -DLIB_V4L2=/usr/lib/aarch64-linux-gnu/libv4l2.so \
              .. \
-    && make -j$(nproc) \
+    && make VERBOSE=1 -j$(nproc) 2>&1 | tee /tmp/build.log || (tail -200 /tmp/build.log && exit 1) \
     && make install \
-    && ldconfig \
-    && cd ../.. \
-    && rm -r jetson-ffmpeg/build
+    && ldconfig
 
 #
 # Build FFmpeg
