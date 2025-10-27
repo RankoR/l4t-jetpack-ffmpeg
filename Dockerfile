@@ -42,7 +42,6 @@ RUN git clone https://github.com/Keylost/jetson-ffmpeg.git \
     && cd jetson-ffmpeg \
     && mkdir build \
     && cd build \
-    # Explicitly tell CMake where each library is
     && cmake -DCMAKE_INSTALL_PREFIX=/usr/local \
              -DLIB_NVBUFSURFACE=/usr/lib/aarch64-linux-gnu/nvidia/libnvbufsurface.so \
              -DLIB_NVBUFSURFTRANSFORM=/usr/lib/aarch64-linux-gnu/nvidia/libnvbufsurftransform.so \
