@@ -38,6 +38,12 @@ RUN apt-get update && \
 #
 FROM build-dependencies AS build-nvmpi
 
+RUN echo "=== Checking if NVIDIA libraries exist at build-nvmpi stage ===" \
+    && ls -la /usr/lib/aarch64-linux-gnu/nvidia/ || echo "NVIDIA directory NOT FOUND" \
+    && find /usr/lib/aarch64-linux-gnu -name "libnvbufsurface*" 2>/dev/null || echo "No nvbufsurface found" \
+    && echo "=== Checking installed packages ===" \
+    && dpkg -l | grep nvidia || echo "No nvidia packages found"
+
 RUN git clone https://github.com/Keylost/jetson-ffmpeg.git \
     && cd jetson-ffmpeg \
     && mkdir build \
