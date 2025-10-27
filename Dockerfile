@@ -101,16 +101,16 @@ RUN apt-get update && \
     numactl \
     && rm -rf /var/lib/apt/lists/*
 
-COPY --from=ffmpeg-builder /usr/local/bin/ffmpeg /usr/local/bin/
-COPY --from=ffmpeg-builder /usr/local/bin/ffprobe /usr/local/bin/
-COPY --from=ffmpeg-builder /usr/local/lib/ /usr/local/lib/
-COPY --from=ffmpeg-builder /usr/local/share/ffmpeg /usr/local/share/ffmpeg
+COPY --from=build-ffmpeg /usr/local/bin/ffmpeg /usr/local/bin/
+COPY --from=build-ffmpeg /usr/local/bin/ffprobe /usr/local/bin/
+COPY --from=build-ffmpeg /usr/local/lib/ /usr/local/lib/
+COPY --from=build-ffmpeg /usr/local/share/ffmpeg /usr/local/share/ffmpeg
 
-COPY --from=ffmpeg-builder /usr/local/lib/libnvmpi.so.1.0.0 /usr/local/lib/libnvmpi.so.1.0.0
-COPY --from=ffmpeg-builder /usr/local/lib/libnvmpi.so.1 /usr/local/lib/libnvmpi.so.1
-COPY --from=ffmpeg-builder /usr/local/lib/libnvmpi.so /usr/local/lib/libnvmpi.so
-COPY --from=ffmpeg-builder /usr/local/include/nvmpi.h /usr/local/include/nvmpi.h
-COPY --from=ffmpeg-builder /usr/local/lib/libnvmpi.a /usr/local/lib/libnvmpi.a
-COPY --from=ffmpeg-builder /usr/local/include/nvmpi.h /usr/local/include/nvmpi.h
-COPY --from=ffmpeg-builder /usr/local/share/pkgconfig/nvmpi.pc /usr/local/share/pkgconfig/nvmpi.pc
-COPY --from=ffmpeg-builder /usr/local/lib/pkgconfig/nvmpi.pc /usr/local/lib/pkgconfig/nvmpi.pc
+COPY --from=build-ffmpeg /usr/local/lib/libnvmpi.so.1.0.0 /usr/local/lib/libnvmpi.so.1.0.0
+COPY --from=build-ffmpeg /usr/local/lib/libnvmpi.so.1 /usr/local/lib/libnvmpi.so.1
+COPY --from=build-ffmpeg /usr/local/lib/libnvmpi.so /usr/local/lib/libnvmpi.so
+COPY --from=build-ffmpeg /usr/local/include/nvmpi.h /usr/local/include/nvmpi.h
+COPY --from=build-ffmpeg /usr/local/lib/libnvmpi.a /usr/local/lib/libnvmpi.a
+COPY --from=build-ffmpeg /usr/local/include/nvmpi.h /usr/local/include/nvmpi.h
+COPY --from=build-ffmpeg /usr/local/share/pkgconfig/nvmpi.pc /usr/local/share/pkgconfig/nvmpi.pc
+COPY --from=build-ffmpeg /usr/local/lib/pkgconfig/nvmpi.pc /usr/local/lib/pkgconfig/nvmpi.pc
