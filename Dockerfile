@@ -38,18 +38,16 @@ RUN apt-get update && \
 #
 FROM build-dependencies AS build-nvmpi
 
-RUN echo "=== Checking if NVIDIA libraries exist at build-nvmpi stage ===" \
-    && ls -la /usr/lib/aarch64-linux-gnu/nvidia/ || echo "NVIDIA directory NOT FOUND" \
-    && find /usr/lib/aarch64-linux-gnu -name "libnvbufsurface*" 2>/dev/null || echo "No nvbufsurface found" \
-    && echo "=== Checking installed packages ===" \
-    && dpkg -l | grep nvidia || echo "No nvidia packages found"
-
 RUN git clone https://github.com/Keylost/jetson-ffmpeg.git \
     && cd jetson-ffmpeg \
     && mkdir build \
     && cd build \
+    # Explicitly tell CMake where each library is
     && cmake -DCMAKE_INSTALL_PREFIX=/usr/local \
-             -DCMAKE_LIBRARY_PATH="/usr/lib/aarch64-linux-gnu/nvidia;/usr/lib/aarch64-linux-gnu" \
+             -DLIB_NVBUFSURFACE=/usr/lib/aarch64-linux-gnu/nvidia/libnvbufsurface.so \
+             -DLIB_NVBUFSURFTRANSFORM=/usr/lib/aarch64-linux-gnu/nvidia/libnvbufsurftransform.so \
+             -DLIB_NVJPEG=/usr/lib/aarch64-linux-gnu/nvidia/libnvjpeg.so \
+             -DLIB_V4L2=/usr/lib/aarch64-linux-gnu/libv4l2.so \
              .. \
     && make -j$(nproc) \
     && make install \
