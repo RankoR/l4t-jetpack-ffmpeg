@@ -38,24 +38,19 @@ RUN apt-get update && \
 #
 FROM build-dependencies AS build-nvmpi
 
-# Find NVIDIA libraries before building nvmpi
-RUN echo "=== Searching for NVIDIA multimedia libraries ===" \
-    && find / -name "libnvbufsurface.so*" 2>/dev/null || echo "libnvbufsurface not found" \
-    && find / -name "libnvbufsurftransform.so*" 2>/dev/null || echo "libnvbufsurftransform not found" \
-    && find / -name "libnvjpeg.so*" 2>/dev/null || echo "libnvjpeg not found" \
-    && echo "=== Checking standard NVIDIA paths ===" \
-    && ls -la /usr/lib/aarch64-linux-gnu/nvidia/ 2>/dev/null || echo "No nvidia directory"
-
 RUN git clone https://github.com/Keylost/jetson-ffmpeg.git \
     && cd jetson-ffmpeg \
     && mkdir build \
     && cd build \
-    && cmake -DCMAKE_INSTALL_PREFIX=/usr/local .. \
+    && cmake -DCMAKE_INSTALL_PREFIX=/usr/local \
+             -DCMAKE_LIBRARY_PATH="/usr/lib/aarch64-linux-gnu/nvidia;/usr/lib/aarch64-linux-gnu" \
+             .. \
     && make -j$(nproc) \
     && make install \
     && ldconfig \
     && cd ../.. \
     && rm -r jetson-ffmpeg/build
+
 #
 # Build FFmpeg
 #
