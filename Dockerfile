@@ -56,6 +56,9 @@ RUN cd /usr/lib/aarch64-linux-gnu/nvidia && \
     done && \
     ldconfig
 
+RUN mkdir -p /usr/lib/aarch64-linux-gnu/nvidia && \
+    cp -a /usr/lib/aarch64-linux-gnu/nvidia/* /usr/lib/aarch64-linux-gnu/nvidia/ 2>/dev/null || true
+
 RUN git clone https://github.com/Keylost/jetson-ffmpeg.git \
     && cd jetson-ffmpeg \
     && mkdir build \
