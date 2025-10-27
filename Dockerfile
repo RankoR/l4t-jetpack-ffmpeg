@@ -38,8 +38,6 @@ RUN apt-get update && \
 #
 FROM build-dependencies AS build-nvmpi
 
-RUN ls -la /usr/lib/aarch64-linux-gnu/nvidia/libnvjpeg.so
-
 RUN git clone https://github.com/Keylost/jetson-ffmpeg.git \
     && cd jetson-ffmpeg \
     && mkdir build \
