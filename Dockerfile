@@ -57,7 +57,8 @@ RUN cd /usr/lib/aarch64-linux-gnu/nvidia && \
     ldconfig
 
 RUN mkdir -p /usr/lib/aarch64-linux-gnu/nvidia && \
-    cp -a /usr/lib/aarch64-linux-gnu/nvidia/* /usr/lib/aarch64-linux-gnu/nvidia/ 2>/dev/null || true
+    cp -a /usr/lib/aarch64-linux-gnu/nvidia/* /usr/lib/aarch64-linux-gnu/nvidia/ 2>/dev/null || true \
+    && ls -la /usr/lib/aarch64-linux-gnu/nvidia/libnvjpeg.so
 
 RUN git clone https://github.com/Keylost/jetson-ffmpeg.git \
     && cd jetson-ffmpeg \
